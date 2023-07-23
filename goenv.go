@@ -2,6 +2,7 @@ package goenv
 
 import (
 	"bytes"
+	"fmt"
 	"github.com/adjust/go-gypsy/yaml"
 	"io"
 	"log"
@@ -135,14 +136,16 @@ func (goenv *Goenv) GetArray(spec string, defaultValue []string) []string {
 }
 
 func (goenv *Goenv) GetMap(spec string, defaultValue map[string]string) map[string]string {
-	node, err := yaml.Child(goenv.configFile.Root, goenv.environment+"."+spec)
+	node, err := yaml.Child(goenv.configFile.Root, fmt.Sprintf("%s.%s", goenv.environment, spec))
 	if err != nil {
 		return defaultValue
 	}
+
 	confMap, ok := node.(yaml.Map)
 	if !ok {
 		return defaultValue
 	}
+
 	result := make(map[string]string)
 	for k, v := range confMap {
 		if v == nil {
@@ -151,6 +154,7 @@ func (goenv *Goenv) GetMap(spec string, defaultValue map[string]string) map[stri
 		}
 		result[k] = (v.(yaml.Scalar)).String()
 	}
+
 	return result
 }
 
