@@ -148,11 +148,11 @@ func (goenv *Goenv) GetMap(spec string, defaultValue map[string]string) map[stri
 
 	result := make(map[string]string)
 	for k, v := range confMap {
-		if v == nil {
-			result[k] = ""
-			continue
+		val := ""
+		if v != nil {
+			val = (v.(yaml.Scalar)).String()
 		}
-		result[k] = (v.(yaml.Scalar)).String()
+		result[k] = val
 	}
 
 	return result
