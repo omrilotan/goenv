@@ -135,6 +135,38 @@ func (goenv *Goenv) GetArray(spec string, defaultValue []string) []string {
 	return result
 }
 
+func (goenv *Goenv) GetArrayOfMap(spec string, defaultValue []map[string]string) (result []map[string]string) {
+	node, err := yaml.Child(goenv.configFile.Root, fmt.Sprintf("%s.%s", goenv.environment, spec))
+	if err != nil {
+		return defaultValue
+	}
+
+	list, ok := node.(yaml.List)
+	if !ok {
+		return defaultValue
+	}
+
+	for _, i := range list {
+		confMap, ok := i.(yaml.Map)
+		if !ok {
+			continue
+		}
+
+		resultMap := make(map[string]string)
+		for k, v := range confMap {
+			val := ""
+			if v != nil {
+				val = (v.(yaml.Scalar)).String()
+			}
+			resultMap[k] = val
+		}
+
+		result = append(result, resultMap)
+	}
+
+	return result
+}
+
 func (goenv *Goenv) GetMap(spec string, defaultValue map[string]string) map[string]string {
 	node, err := yaml.Child(goenv.configFile.Root, fmt.Sprintf("%s.%s", goenv.environment, spec))
 	if err != nil {
